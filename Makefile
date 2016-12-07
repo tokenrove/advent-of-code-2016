@@ -11,6 +11,6 @@ day1:	day1.o
 	ld -melf_i386 -nostdlib -o $@ $^
 
 check: all
-	./t/tests.bats
+	prove -v
 
 .PHONY: clean all check
