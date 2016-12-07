@@ -1,1 +1,4 @@
 t/day[0-9].in
+t/day[0-9].out.[ab]
+*.class
+*.o
