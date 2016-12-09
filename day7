@@ -9,7 +9,7 @@ use strict;
 sub abba {
   return 0 if (/\[[a-z]*([a-z])((?!\1)[a-z])\2\1[a-z]*\]/);
   for (split(/\[[^\[\]]*\]/)) {
-    if (/([a-z])((?!\1)[a-z])\2\1/) { return 1; }
+    return 1 if (/([a-z])((?!\1)[a-z])\2\1/)
   }
   return 0
 }
@@ -17,15 +17,11 @@ sub abba {
 sub ababab {
   my $orig = $_;
   for (split(/\[[a-z]*\]/)) {
-    while (length($_) > 0) {
-      if (/([a-z])((?!\1)[a-z])\1/) {
-        my $bab = "$2$1$2";
-        return 1 if $orig =~ /\[ [a-z]* $bab [a-z]* \]/x
-      }
-      $_ = substr($_,1)
+    while (/(?=([a-z])((?!\1)[a-z])\1)/g) {
+        return 1 if $orig =~ /\[[a-z]*$2$1$2[a-z]*\]/
     }
   }
-  return 0;
+  return 0
 }
 
 my $f = \&ababab;
