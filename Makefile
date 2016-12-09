@@ -1,4 +1,3 @@
-
 CC ?= gcc
 CFLAGS ?= -Wall -Wextra -Wconversion -g
 JAVAC ?= javac
@@ -6,7 +5,7 @@ JAVAC ?= javac
 all: day1 day5 day8
 
 clean:
-	$(RM) day1.o day1
+	$(RM) day1
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $^
@@ -17,8 +16,8 @@ clean:
 Day5.class: Day5.java
 	$(JAVAC) $^
 
-day1:	day1.o
-	ld -melf_i386 -nostdlib -o $@ $^
+day1:	day1.lisp
+	buildapp --output $@ --load $^ --entry day1:main
 
 day5: Day5.class
 
