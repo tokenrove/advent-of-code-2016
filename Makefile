@@ -3,7 +3,7 @@ CFLAGS ?= -Wall -Wextra -Wconversion -g
 JAVAC ?= javac
 CM3 ?= /usr/local/cm3/bin/cm3
 
-all: day1 day5 day8 day9
+all: day1 day5 day8 day9 day10
 
 clean:
 	$(RM) day1 Day5.class day8 day8.o day9
@@ -29,6 +29,9 @@ day8: day8.o
 day9: day9_m3/Day9.m3
 	cd day9_m3 && $(CM3) -build
 	cp day9_m3/*/day9 .	# stupid
+
+day10: day10.ml
+	ocamlc -o $@ $^
 
 check: all
 	prove -v
