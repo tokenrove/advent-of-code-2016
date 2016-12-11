@@ -5,3 +5,4 @@ t/day[0-9].out.[ab]
 *.fasl
 day1
 day8
+day9_m3/AMD64_LINUX/
