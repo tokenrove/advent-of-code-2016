@@ -1,0 +1,3 @@
+import("libm3")
+implementation("Day9")
+program("day9")
