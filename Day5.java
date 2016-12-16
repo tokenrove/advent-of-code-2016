@@ -5,7 +5,7 @@ class CountingBuffer {
     private static final int max_digits = 18;
     private byte[] bs;
     private long count;
-    private int prefix_len, len;
+    private int prefix_len, len, log10_count;
 
     public CountingBuffer(byte[] prefix, long count)
     {
@@ -20,6 +20,7 @@ class CountingBuffer {
     private void renderComplete()
     {
         byte[] bytes = Long.toString(count).getBytes();
+        log10_count = bytes.length - 1;
         for (int i = 0; i < bytes.length; ++i)
             bs[prefix_len+i] = bytes[i];
         this.len = bytes.length + prefix_len;
@@ -28,8 +29,21 @@ class CountingBuffer {
     public void increment()
     {
         ++count;
-        renderComplete();
-        // XXX more efficient implementation here
+        renderDigit(count, log10_count);
+    }
+
+    private void renderDigit(long n, int d)
+    {
+        if (d < 0) {
+            System.arraycopy(bs, prefix_len, bs, prefix_len+1, ++log10_count);
+            bs[prefix_len] = '1';
+            ++this.len;
+            return;
+        }
+        byte digit = (byte)('0' + n%10);
+        bs[prefix_len+d] = digit;
+        if ('0' == digit)
+            renderDigit(n/10, d-1);
     }
 
     public byte[] bytes() { return bs; }
