@@ -4,50 +4,39 @@ import java.security.MessageDigest;
 class CountingBuffer {
     private static final int max_digits = 18;
     private byte[] bs;
-    private long count;
     private int prefix_len, len, log10_count;
 
-    public CountingBuffer(byte[] prefix, long count)
+    public CountingBuffer(byte[] prefix)
     {
         bs = new byte[prefix.length + max_digits];
         prefix_len = prefix.length;
-        for (int i = 0; i < prefix_len; ++i)
-            bs[i] = prefix[i];
-        this.count = count;
-        renderComplete();
-    }
-
-    private void renderComplete()
-    {
-        byte[] bytes = Long.toString(count).getBytes();
-        log10_count = bytes.length - 1;
-        for (int i = 0; i < bytes.length; ++i)
-            bs[prefix_len+i] = bytes[i];
-        this.len = bytes.length + prefix_len;
+        System.arraycopy(prefix, 0, bs, 0, prefix_len);
+        bs[prefix_len] = '0';
+        log10_count = 0;
     }
 
     public void increment()
     {
-        ++count;
-        renderDigit(count, log10_count);
+        renderDigit(log10_count);
     }
 
-    private void renderDigit(long n, int d)
+    private void renderDigit(int d)
     {
         if (d < 0) {
             System.arraycopy(bs, prefix_len, bs, prefix_len+1, ++log10_count);
+            assert(log10_count < max_digits);
             bs[prefix_len] = '1';
-            ++this.len;
             return;
         }
-        byte digit = (byte)('0' + n%10);
-        bs[prefix_len+d] = digit;
-        if ('0' == digit)
-            renderDigit(n/10, d-1);
+        byte digit = ++bs[prefix_len+d];
+        if (':' == digit) {     // sry ebcdic
+            bs[prefix_len+d] = '0';
+            renderDigit(d-1);
+        }
     }
 
     public byte[] bytes() { return bs; }
-    public int len() { return len; }
+    public int len() { return prefix_len + log10_count + 1; }
 }
 
 class Day5 {
@@ -57,7 +46,7 @@ class Day5 {
     {
         MessageDigest md = MessageDigest.getInstance("MD5");
         boolean easy_mode = args[0].equals("--initial");
-        CountingBuffer cb = new CountingBuffer(args[easy_mode?1:0].getBytes(), 0);
+        CountingBuffer cb = new CountingBuffer(args[easy_mode?1:0].getBytes());
         byte[] out = new byte[16], pw = new byte[8];
 
         int pwchars = 0;
