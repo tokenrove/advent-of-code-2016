@@ -3,7 +3,7 @@ CFLAGS ?= -Wall -Wextra -Wconversion -g
 JAVAC ?= javac
 CM3 ?= /usr/local/cm3/bin/cm3
 
-all: day1 day5 day8 day9 day10
+all: day1 day5 day8 day9 day10 day12
 
 clean:
 	$(RM) day1 Day5.class day8 day8.o day9
@@ -20,6 +20,9 @@ Day5.class: Day5.java
 
 day1:	day1.lisp
 	buildapp --output $@ --load $^ --entry day1:main
+
+day12:	day12.lisp
+	buildapp --output $@ --load $^ --entry main
 
 day5: Day5.class
 
