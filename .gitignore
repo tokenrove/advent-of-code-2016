@@ -1,5 +1,7 @@
 t/day[0-9].in
+t/day[12][0-9].in
 t/day[0-9].out.[ab]
+t/day[12][0-9].out.[ab]
 *.class
 *.o
 *.fasl
