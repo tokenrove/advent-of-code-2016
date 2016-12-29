@@ -1,3 +1,6 @@
+(defpackage :day12 (:use :cl) (:export #:main))
+(in-package :day12)
+
 (defun read-insns (in)
   (coerce
    (loop for insn = (read in nil nil)

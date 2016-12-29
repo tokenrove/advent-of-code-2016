@@ -22,7 +22,11 @@ day1:	day1.lisp
 	buildapp --output $@ --load $^ --entry day1:main
 
 day12:	day12.lisp
-	buildapp --output $@ --load $^ --entry main
+	buildapp --output $@ --load $^ --entry day12:main
+
+day25:	day25.lisp
+	buildapp --output $@ --load $^ --entry day25:main
+
 day20: day20.hs
 	ghc --make day20
 
