@@ -6,7 +6,11 @@ t/day[12][0-9].out.[ab]
 *.o
 *.fasl
 *.beam
+*.cmi
+*.cmo
 day1
 day8
 day9_m3/AMD64_LINUX/
+day10
+day12
 day20
