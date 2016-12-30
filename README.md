@@ -6,6 +6,9 @@ don't know if I'll go through with that.  I did make a list of 46
 languages I had at least written a trivial program in before that
 would be usable for solving problems.
 
+In the end it was all a horrible rush and it's mostly hacks.  Such is
+life.
+
 ## Requirements
 
  - bats, prove for testing
@@ -18,19 +21,35 @@ would be usable for solving problems.
  - day 7: perl 5
  - day 8: C: any reasonable C compiler
  - day 9: Modula-3: [cm3](https://modula3.elegosoft.com/cm3/)
+ - day 10: OCaml
+!- day 11: Prolog? should use Picat
+?- day 12: Tcl?  CL
+?- day 13: CL? something with arrays, recursion, and popcount
+ - day 14: Python
+?- day 15: J
+?- day 16: CL
+ - day 17: Erlang
+?- day 18: CL
+!- day 19:
+!- day 20: Haskell
+!- day 21: should use icon
+!- day 22: Prolog
+?- day 23: CL
+?- day 24: CL
+?- day 25: CL
 
 ## Notes
 
 I don't know why I started using `--initial` as the argument to switch
 between the first and second halves of the problems.  It's dumb, I
-know.
+know, and then I decided to stay consistent.
 
-### day 1
+### Day 1
 
 Initially I wanted to do this in x86 assembly abusing the BCD
-instructions, to demonstrate what compact code they can produce.  I
-also thought that maybe keeping the coordinates in Morton Z-ordering
-might be fun.
+instructions (in particular `FBSTP`), to demonstrate what compact code
+they can produce.  I also thought that maybe keeping the coordinates
+in Morton Z-ordering might be fun.
 
 But I didn't finish this implementation, and a few days later, I went
 back, and decided to implement this using complex numbers to represent
@@ -109,6 +128,11 @@ implemented the simple thing and let it burn CPU cycles.
 I tried to avoid getting bitten by Java's lack of unsigned types and
 got bitten anyway.
 
+Later I revisited this and avoided generating garbage.  It probably
+would have been more productive to parallelize this, however.  Even
+just using a `synchronized` variable would probably work, since the
+contention on it shouldn't be high.
+
 ### Day 6
 
 This kind of problem is just designed for vector languages.  Ignoring
@@ -151,7 +175,139 @@ doesn't occur in the test inputs.
 Transitive closure; could use a graph representation and propagate
 recursively.
 
-Logic languages would probably make this trivial.
+Logic languages would probably make this trivial.  I used OCaml
+because it looked like an interpreter pattern would be important here,
+but it turned out that Prolog would have been a much better choice.
+
+### Day 11
+
+PiCat, Prolog, or Mercury seems like the obvious choice here.  I
+started in Prolog, and parsing the input with DCGs was great, but
+couldn't seem to construct a suitable backtracking solver that didn't
+blow up.
+
+### Day 12
+
+This was such a simple interpreter pattern that I immediately dashed
+it off in Common Lisp, with an array holding the instructions, and
+abusing `symbol-value` slightly for the registers.
+
+My next thought was to do it in Tcl, where I could take that kind of
+eval cheating to an extreme (maybe even safely with `interp`).  While
+I was determining how to store the instructions in Tcl, I realized a
+fun Scheme implementation might be to use a list and make all jump
+targets point into the list, since they're all static, so we can avoid
+the O(n) search at interpretation time.
+
+### Day 13
+
+Colored by day 11, I started approaching this as a classic AI search
+problem and started implementing another BFS in Prolog.
+
+Popcount modulo 2 is the parity of a word.
+
+Flood fill is a better solution, especially once we get to part 2.
+
+### Day 14
+
+It would have been nice to do this with bit shifting tricks, but most
+of the languages where working with 128-bit numbers is easy don't have
+built-in MD5 primitives.
+
+Erlang came to mind as a possibility (easy to work with large numbers,
+and has built-in MD5), but I ended up just hacking out a quick Python
+solution.
+
+If I had done it in Erlang, I could have parallelized it, at least
+searching each five-digit number separately
+
+### Day 15
+
+The Chinese Remainder Theorem immediately came to mind when I saw the
+puzzle, and a quick check of the input for coprime bases confirmed it,
+so my first approach was just to feed the values into
+[maxima](http://maxima.sourceforge.net/docs/manual/maxima_29.html#chinese);
+of course the initial positions actually need to have their position
+added to their value (`init+1+⍳⍴init`).  But this wasn't giving me a
+reasonable answer, so I brute forced it in a line of J.  We just need
+to check `0 = bases | init+y` We know by the CRT that we don't need to
+check any higher than `×/bases`.
+
+I realized after brute forcing it that in order to use existing CRT
+solvers, I needed to use `(bases|bases-init+1+i.$init)` as the
+remainders.  A good CRT solver (like
+[this one in J](http://code.jsoftware.com/wiki/Essays/Chinese_Remainder_Theorem))
+solves the problem instantly.
+
+### Day 16
+
+It shouldn't be hard to figure out how to compute this without
+actually executing the dragon curve, but once again, the numbers are
+small enough for us to take a naïve approach.
+
+There are some excuses to use fancy bit-twiddling tricks here,
+especially Morton Z-order decoding.
+
+It is hard to resist using Common Lisp given its profusion of bit
+twiddling features and the ease of working with arbitrary-length bit
+vectors.
+
+### Day 17
+
+Breadth-first search, then depth-first search.  Still need to
+parallelize this.
+
+### Day 18
+
+```j
+3 ({.={:);._3 (|.0,|.0,('^'='...^^.'))
+```
+
+### Day 19
+
+I knew I had seen this before but I couldn't remember where. Then I
+was talking with Vincent in the kitchen and he mentioned the elves
+killing themselves, which was clue enough for me to suddenly realize
+this was the Josephus problem.
+
+### Day 22
+
+Looks like a graph problem, although we see that we actually have
+another Von Neumann-neighborhood-connected array like many of the
+other search problems.
+
+### Day 23
+
+Although it's possible to run the second case without anything fancy,
+as the instructions hint, it would be nice to speed this up.  I was
+immediately reminded of strength reduction although of course this
+wouldn't be that; more the opposite.  Detect induction variables and
+strength "increase" their operations.
+
+### Day 24
+
+Although an early thought from seeing the example is to turn it into a
+graph, collapsing corridors into edges with a weight equal to their
+length, after seeing the actual input and knowing that the number of
+points to hit was much smaller than the total space, what about BFS
+for all pairs to find the shortest paths between points, then choose
+the route from 0 that minimizes the distance?
+
+Again, once you've constructed one path (perhaps the obvious one),
+although you have to check every permutation, you can immediately
+discard those paths that would be longer than the shortest path found.
+I guess BFS again is possible but it's probably faster to use some
+kind of dynamic programming formulation.
+
+### Day 25
+
+Just walked through the assembly by hand and then, although clearly
+there was a closed-form way to figure out a value a smallest value
+with appropriate remainders (should have alternating bits), I just
+decided to run the inner loop with my simulator, bailing out if we
+didn't emit the right pattern.  This quickly found the smallest value
+with alternating 1/0 bits, from which I then removed the initial
+offset.
 
 ## Quotes
 
