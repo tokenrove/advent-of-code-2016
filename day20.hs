@@ -16,8 +16,8 @@ merge (a,b) (c,d) = (min a c, max b d)
 
 mergecat :: Range -> [Range] -> [Range]
 mergecat x [] = [x]
-mergecat x (y:ys) | overlap x y = ((merge x y):ys)
-mergecat x (y:ys) = (x:y:ys)
+mergecat x (y:ys) | overlap x y = merge x y : ys
+mergecat x (y:ys) = x:y:ys
 
 repeatedlyMerge :: [Range] -> [Range]
 repeatedlyMerge pairs = ms
@@ -30,7 +30,7 @@ main = do
   contents <- getContents
   args <- System.Environment.getArgs
   let ms = repeatedlyMerge $ sort $ map split $ lines contents in
-    if elem "--initial" args then
+    if "--initial" `elem` args then
       print $ succ $ snd $ head ms
     else
       -- technically this is wrong, if the blacklist doesn't end with 2^32-1
